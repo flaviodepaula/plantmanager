@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     SafeAreaView,
     Text,
@@ -17,12 +17,29 @@ import wateringImg from '../assets/watering.png';
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
 
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 export function Welcome() {
 
     const navigation = useNavigation();
 
+    const [userName, setUserName] = useState<string>();
+
+    useEffect(() => {
+        async function loadStorageUserName() {
+            const user = await AsyncStorage.getItem('@plantmanager:user');
+            setUserName(user || '');
+        }
+
+        loadStorageUserName();
+    }, [])
+
     function handleStart() {
         navigation.navigate("UserIdentification");
+        // if (!userName)
+        //     navigation.navigate("UserIdentification");
+        // else
+        //     navigation.navigate("PlantSelect");
     }
 
     return (

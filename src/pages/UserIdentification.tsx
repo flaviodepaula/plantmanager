@@ -10,8 +10,11 @@ import {
     KeyboardAvoidingView,
     TouchableWithoutFeedback,
     Keyboard,
+    Alert,
+    AlertOptions
 } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
@@ -24,8 +27,30 @@ export function UserIdentification() {
     const [name, setName] = useState<string>();
     const navigation = useNavigation();
 
-    function handleSubmit() {
-        navigation.navigate("Confirmation");
+    async function handleSubmit() {
+        if (!name) {
+            //title: string, message?: string, buttons?: AlertButton[], options?: AlertOptions
+            return Alert.alert('Já vamos continuar!!!',
+                'Primeiro preciso saber como chamar você 😅',
+                [
+                    { text: "OK", onPress: () => { } }
+                ],
+                { cancelable: true })
+        }
+
+        try {
+            await AsyncStorage.setItem('@plantmanager:user', name);
+            navigation.navigate("Confirmation", {
+                title: 'Prontinho',
+                subTitle: 'Agora vamos começar a cuidar das suas plantinhas com muito cuidado',
+                buttonTitle: 'Começar',
+                icon: 'smile',
+                nextScreen: 'PlantSelect'
+
+            });
+        } catch {
+            Alert.alert('Não foi possível salvar o seu nome 😥');
+        }
     }
 
     function handleInputBlur() {
@@ -57,7 +82,7 @@ export function UserIdentification() {
 
                                 <Text style={styles.title}>
                                     Como podemos {'\n'}
-                            chamar você?
+                                    chamar você?
                             </Text>
                             </View>
                             <TextInput
